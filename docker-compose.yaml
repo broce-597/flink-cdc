@@ -2,15 +2,17 @@ version: '3'
 services:
   sql-client:
     build: ./client-image
-    image: demo/debezium-flink-sql
+    image: broce/flink-sql-client
+    container_name: flink-sql-client
     depends_on:
       - jobmanager
-      - elasticsearch
+       - elasticsearch
     environment:
       FLINK_JOBMANAGER_HOST: jobmanager
-      ES_HOST: elasticsearch
+       ES_HOST: elasticsearch
   jobmanager:
     image: flink:1.12.1-scala_2.11
+    container_name: jobmanager
     ports:
       - "8081:8081"
     command: jobmanager
@@ -23,32 +25,33 @@ services:
     command: taskmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-  elasticsearch:
-    image: elasticsearch:7.6.0
-    container_name: elasticsearch
-    restart: always
-    environment:
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - discovery.type=single-node
-      - http.cors.enabled=true
-      - http.cors.allow-origin=*
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    ulimits:
-      memlock:
+   elasticsearch:
+     image: elasticsearch:7.6.0
+     container_name: elasticsearch
+     restart: always
+     environment:
+       - cluster.name=docker-cluster
+       - bootstrap.memory_lock=true
+       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+       - discovery.type=single-node
+       - http.cors.enabled=true
+       - http.cors.allow-origin=*
+     ports:
+       - "9200:9200"
+       - "9300:9300"
+     ulimits:
+       memlock:
         soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-  mysql:
-   image: debezium/example-mysql:1.1
-   ports:
-     - "3306:3306"
-   environment:
-     - MYSQL_ROOT_PASSWORD=123456
-     - MYSQL_USER=mysqluser
-     - MYSQL_PASSWORD=mysqlpw
+         hard: -1
+       nofile:
+         soft: 65536
+         hard: 65536
+   mysql:
+    image: debezium/example-mysql:1.1
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=mysqlpw
